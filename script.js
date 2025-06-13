@@ -1,5 +1,9 @@
 
 
+/* ======================================================================== */
+
+// Gameboard handles logic for the gameboard itself
+// initializing board, checking token placements, checking token alignments for wins
 
 const Gameboard = (() => {
 
@@ -75,7 +79,7 @@ const Gameboard = (() => {
         
     };
 
-
+    // for first page load
     initializeBoard();
 
     return {
@@ -96,9 +100,17 @@ function createPlayer(name, token) {
 
 
 
+/* =================================================================================== */
+
+// GameController controls flow of the game
+
+// creating players, tracking the currently active player, switching players each turn
+// playing each round, making annoucements (console version)
+// contains reset function 
 
 const GameController = (() => {
     
+    // initialize players and their tokens
     const players = [createPlayer("Player 1", "X"), createPlayer("Player 2", "O")];
     let activePlayer = players[0];
 
@@ -116,6 +128,7 @@ const GameController = (() => {
 
 
     const playRound = (row, col) => {
+    // returns true for valid player move, false for invalid move (in which case same player plays again)
 
         if (Gameboard.placeToken(row, col, getActivePlayer().token)) {
 
@@ -128,7 +141,7 @@ const GameController = (() => {
 
             } else if (result === null) {
                 console.log(`It's a draw! Game over`);
-                // other draw logic like resetting board 
+                Gameboard.printBoard();
                 return true;
 
             } else {
@@ -148,12 +161,13 @@ const GameController = (() => {
 
     const resetBoard = () => {
         Gameboard.initializeBoard();
-        activePlayer = players[0];
+        activePlayer = players[0]; // reset to player 1
+        console.log("New game started");
         roundAnnounce();
     };
 
 
-    roundAnnounce();
+    roundAnnounce(); // start first game when page first loads
 
 
     return {
@@ -165,7 +179,13 @@ const GameController = (() => {
 })();
 
 
+/* ========================================================================== */
 
+// SreenController handles UI interface and user interactions
+
+// creating DOM game board grid, handles click events, update player display
+// resetting visual board, displaying restart button
+// coordinates between user action and game logic from GameController
 
 const ScreenController = (() => {
 
@@ -174,6 +194,8 @@ const ScreenController = (() => {
 
 
     const createBoard = () => {
+        // create 3x3 grid of clickable buttons
+
         for (let row = 0; row < 3; row++) {
             for (let col = 0; col < 3; col++) {
                 const button = document.createElement("button");
@@ -186,16 +208,22 @@ const ScreenController = (() => {
         };
     };
 
+    
+    // handle board cell click logic
     const clickHandler = (event) => {
         let gameState = Gameboard.winCheck();
 
         if (gameState === true || gameState === null) {
             return;
 
-        } else if (event.target.classList.contains("boardCell")) { // make sure a board cell is clicked, not the gaps in between
+        // make sure a board cell is clicked, not the gaps in between
+        } else if (event.target.classList.contains("boardCell")) {
+            
+            // get position from clicked button's data attributes
             const row = parseInt(event.target.dataset.row);
             const col = parseInt(event.target.dataset.col);
 
+            // update UI board if valid move
             activePlayer = GameController.getActivePlayer();
             if (GameController.playRound(row, col)) {
                 event.target.textContent = activePlayer.token;
@@ -226,6 +254,7 @@ const ScreenController = (() => {
         event.target.remove(); // remove restart button when new game begins
     };
 
+    // restart button
     const showRestart = () => {
         const restartDiv = document.querySelector(".restart");
         const restartBtn = document.createElement("button");
@@ -237,53 +266,32 @@ const ScreenController = (() => {
     };
 
 
-
+    // update player displays, announcements and game-end button display
     function updateScreen(activePlayer) {
 
         let gameState = Gameboard.winCheck();
 
+        // game won
         if (gameState === true) {
             playerDiv.textContent = `${activePlayer.name} has won the game !`;
             showRestart();
-            // other win logic like triggering restart game button
             return;
-
+        
+        // game draw
         } else if (gameState === null) {
             playerDiv.textContent = `It's a draw. Game over`;
             showRestart();
             return;
-
+        
+        // game continues
         } else {
             playerDiv.textContent = `${GameController.getActivePlayer().name}'s turn`;
         };
     };
 
-
-    // const clickHandler = (event) => {
-    //     let gameState = Gameboard.winCheck();
-
-    //     if (gameState === true || gameState === null) {
-    //         return;
-
-    //     } else if (event.target.classList.contains("boardCell")) { // make sure a board cell is clicked, not the gaps in between
-    //         const row = parseInt(event.target.dataset.row);
-    //         const col = parseInt(event.target.dataset.col);
-
-    //         activePlayer = GameController.getActivePlayer();
-    //         if (GameController.playRound(row, col)) {
-    //             event.target.textContent = activePlayer.token;
-    //             updateScreen(activePlayer);
-    //         };
-    //     };
-
-        
-    // };
-
-    // boardContainer.addEventListener("click", clickHandler);
-
+    // initialize game display upon page load
     createBoard();
     updateScreen();
 
-    // return {clearBoard};
 
 })();
