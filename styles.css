@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Press Start 2P", sans-serif;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;    
+}
+
+h1 {
+    padding: 1em;
+}
+
+.player {
+    padding: 1em;
+}
+
+.boardContainer {
+    display: grid;
+    width: 500px;
+    height: 500px;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 2px;
+}
+
+.boardCell {
+    background-color: lightgray;
+    height: 100%;
+    width: 100%;
+    font-size: 120px;
+    font-family: "VT323", "Roboto", sans-serif;
+}
+
+.restartBtn {
+    font-size: 20px;
+    padding: 0.5em 1em;
+    margin: 2em;
+    border-radius: 0px;
+}
